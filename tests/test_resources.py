@@ -1,5 +1,6 @@
 import pytest
 from src.traits_matcher_server import list_persons_resource, list_traits_resource, get_person_resource, create_person_tool, MCPPersonDAO, MCPTraitDAO, Personality
+from src.traits_matcher_server import get_db_connection, PersonModel, TraitModel
 import json
 import asyncio
 
@@ -7,7 +8,7 @@ import asyncio
 def person_dao():
     dao = MCPPersonDAO()
     # Ensure a clean database for testing
-    conn = dao.get_db_connection(dao.db_name)
+    conn = get_db_connection(dao.db_name)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM persons")
     conn.commit()
@@ -18,7 +19,7 @@ def person_dao():
 def trait_dao():
     dao = MCPTraitDAO()
     # Ensure a clean database for testing
-    conn = dao.get_db_connection(dao.db_name)
+    conn = get_db_connection(dao.db_name)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM traits")
     conn.commit()

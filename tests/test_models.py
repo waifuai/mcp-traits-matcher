@@ -1,4 +1,5 @@
 import pytest
+from pydantic import ValidationError
 from src.traits_matcher_server import PersonModel, TraitModel
 
 def test_person_model_valid_data():
@@ -8,7 +9,7 @@ def test_person_model_valid_data():
     assert person.dominance == 2.0
 
 def test_person_model_invalid_data():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         PersonModel(name="John Doe", friendliness=15.0, dominance=2.0)
 
 def test_trait_model_valid_data():
@@ -18,5 +19,5 @@ def test_trait_model_valid_data():
     assert trait.dominance == 2.0
 
 def test_trait_model_invalid_data():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValidationError):
         TraitModel(trait="friendly", friendliness=15.0, dominance=2.0)

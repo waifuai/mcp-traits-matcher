@@ -11,14 +11,14 @@ from typing import Annotated, List, Any, Optional, Dict
 class PersonModel(BaseModel):
     """Represents a person."""
     name: str = Field(description="The person's name.")
-    friendliness: float = Field(description="The person's friendliness score (-10 to 10).")
-    dominance: float = Field(description="The person's dominance score (-10 to 10).")
+    friendliness: float = Field(ge=-10, le=10, description="The person's friendliness score (-10 to 10).")
+    dominance: float = Field(ge=-10, le=10, description="The person's dominance score (-10 to 10).")
 
 class TraitModel(BaseModel):
     """Represents a personality trait."""
     trait: str = Field(description="The name of the trait.")
-    friendliness: float = Field(description="The friendliness score of the trait (-10 to 10).")
-    dominance: float = Field(description="The dominance score of the trait (-10 to 10).")
+    friendliness: float = Field(ge=-10, le=10, description="The friendliness score of the trait (-10 to 10).")
+    dominance: float = Field(ge=-10, le=10, description="The dominance score of the trait (-10 to 10).")
 
 class Personality(BaseModel):
     """Represents a personality profile."""
@@ -133,7 +133,7 @@ class MCPTraitDAO:
             row = cursor.fetchone()
             if row is None:
                 return None
-            return Personality(row['friendliness'], row['dominance'])
+            return Personality(friendliness=row['friendliness'], dominance=row['dominance'])
 
     def add_trait(self, name: str, personality: Personality):
         """Adds a new trait to the database."""
@@ -187,13 +187,13 @@ async def add_description_tool(
             n_dominance = person['n_dominance']
             new_friendliness = ((person['friendliness'] * n_friendliness) + trait.friendliness) / (n_friendliness + 1)
             new_dominance = ((person['dominance'] * n_dominance) + trait.dominance) / (n_dominance + 1)
-            person_dao.update_personality(name, Personality(new_friendliness, new_dominance), n_friendliness + 1, n_dominance + 1)
+            person_dao.update_personality(name, Personality(friendliness=new_friendliness, dominance=new_dominance), n_friendliness + 1, n_dominance + 1)
 
     return f"Description added to person '{name}'."
 
 @mcp.tool(name="create_trait", description="Creates a new personality trait.")
 async def create_trait_tool(
-    name: str = Field(description="The name of the trait."),
+    name: str,
     friendliness: Annotated[float, Field(ge=-10, le=10, description="Friendliness score (-10 to 10).")],
     dominance: Annotated[float, Field(ge=-10, le=10, description="Dominance score (-10 to 10).")]
 ) -> str:
@@ -201,7 +201,7 @@ async def create_trait_tool(
     trait_dao = MCPTraitDAO()
     if trait_dao.get_trait(name):
         raise ValueError(f"Trait with name '{name}' already exists")
-    trait_dao.add_trait(name, Personality(friendliness, dominance))
+    trait_dao.add_trait(name, Personality(friendliness=friendliness, dominance=dominance))
     return f"Trait '{name}' created with friendliness: {friendliness}, dominance: {dominance}."
 
 @mcp.tool(name="find_matches", description="Finds people matching a company's job description.")
@@ -227,13 +227,13 @@ async def find_matches_tool(
     else:
         avg_friendliness = sum(trait_dao.get_trait(trait).friendliness * weight for trait, weight in trait_weights.items()) / sum(trait_weights.values())
         avg_dominance = sum(trait_dao.get_trait(trait).dominance * weight for trait, weight in trait_weights.items()) / sum(trait_weights.values())
-        target_personality = Personality(avg_friendliness, avg_dominance)
+        target_personality = Personality(friendliness=avg_friendliness, dominance=avg_dominance)
 
     # Find people and calculate distances
     persons = person_dao.get_all()
     distances = []
     for person in persons:
-        personality = Personality(person['friendliness'], person['dominance'])
+        personality = Personality(friendliness=person['friendliness'], dominance=person['dominance'])
         dist = distance.euclidean(
             (personality.friendliness, personality.dominance),
             (target_personality.friendliness, target_personality.dominance)
@@ -252,8 +252,10 @@ async def find_matches_tool(
 async def list_persons_resource() -> str:
     """Lists all persons in the database."""
     person_dao = MCPPersonDAO()
-    persons = person_dao.get_all()
-    return json.dumps([PersonModel(**p).model_dump() for p in persons])
+    persons_data = person_dao.get_all()
+    # Map 'person' key from DB to 'name' for the model
+    persons_models = [PersonModel(name=p['person'], friendliness=p['friendliness'], dominance=p['dominance']) for p in persons_data]
+    return json.dumps([p.model_dump() for p in persons_models])
 
 @mcp.resource("traits://all")
 async def list_traits_resource() -> str:
@@ -266,10 +268,12 @@ async def list_traits_resource() -> str:
 async def get_person_resource(name: str) -> str:
     """Gets a person by their name."""
     person_dao = MCPPersonDAO()
-    person = person_dao.get_person(name)
-    if not person:
+    person_data = person_dao.get_person(name)
+    if not person_data:
         raise ValueError(f"Person '{name}' not found")
-    return json.dumps([PersonModel(**person).model_dump()])
+    # Map 'person' key from DB to 'name' for the model
+    person_model = PersonModel(name=person_data['person'], friendliness=person_data['friendliness'], dominance=person_data['dominance'])
+    return json.dumps([person_model.model_dump()])
 
 if __name__ == "__main__":
     mcp.run()

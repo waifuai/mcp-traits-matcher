@@ -1,5 +1,6 @@
 import pytest
 from src.traits_matcher_server import MCPPersonDAO, MCPTraitDAO, Personality
+from src.traits_matcher_server import get_db_connection, Personality
 import sqlite3
 
 @pytest.fixture
