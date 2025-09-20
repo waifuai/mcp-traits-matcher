@@ -1,3 +1,10 @@
+"""Main server implementation for the MCP Traits Matcher.
+
+This module contains the FastMCP server setup, tool definitions, and resource endpoints
+for personality analysis and matching. It provides the core functionality for creating
+persons, managing traits, updating personalities based on descriptions, and finding
+matches between people and job descriptions using Euclidean distance calculations.
+"""
 import json
 import logging
 import os

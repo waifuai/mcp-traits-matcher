@@ -1,3 +1,9 @@
+"""Unit tests for MCP tools functionality.
+
+This module contains tests for the FastMCP tools that provide the core business
+logic, including creating persons, adding descriptions, creating traits, and
+finding matches between people and job descriptions.
+"""
 import pytest
 from src.traits_matcher_server import create_person_tool, add_description_tool, create_trait_tool, find_matches_tool
 from src.daos import MCPPersonDAO, MCPTraitDAO, get_db_connection

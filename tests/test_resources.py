@@ -1,3 +1,9 @@
+"""Unit tests for MCP resource endpoints.
+
+This module contains tests for the FastMCP resource endpoints that expose data
+through the MCP protocol, including listing all persons, listing all traits,
+and retrieving individual person information.
+"""
 import pytest
 from src.traits_matcher_server import list_persons_resource, list_traits_resource, get_person_resource, create_person_tool
 from src.daos import MCPPersonDAO, MCPTraitDAO, get_db_connection

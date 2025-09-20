@@ -1,3 +1,9 @@
+"""Unit tests for Pydantic data models.
+
+This module contains unit tests for all Pydantic models including PersonModel, TraitModel,
+Personality, and request models. Tests cover validation, boundary values, edge cases,
+serialization, and error handling for invalid data.
+"""
 import pytest
 from pydantic import ValidationError
 from src.models import (

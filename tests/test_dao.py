@@ -1,3 +1,9 @@
+"""Unit tests for Data Access Objects (DAOs).
+
+This module contains comprehensive unit tests for the MCPPersonDAO and MCPTraitDAO classes,
+testing database operations, error handling, and edge cases for both person and trait
+management functionality.
+"""
 import pytest
 import os
 from unittest.mock import patch
