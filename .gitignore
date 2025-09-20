@@ -2,3 +2,4 @@ __pycache__
 .pytest_caches
 mcp_persons.db
 mcp_traits.db
+.github

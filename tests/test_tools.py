@@ -1,6 +1,7 @@
 import pytest
-from src.traits_matcher_server import create_person_tool, add_description_tool, create_trait_tool, find_matches_tool, MCPPersonDAO, MCPTraitDAO, Personality
-from src.traits_matcher_server import get_db_connection, Personality
+from src.traits_matcher_server import create_person_tool, add_description_tool, create_trait_tool, find_matches_tool
+from src.daos import MCPPersonDAO, MCPTraitDAO, get_db_connection
+from src.models import Personality
 import asyncio
 
 @pytest.fixture

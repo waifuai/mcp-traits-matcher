@@ -1,6 +1,7 @@
 import pytest
-from src.traits_matcher_server import list_persons_resource, list_traits_resource, get_person_resource, create_person_tool, MCPPersonDAO, MCPTraitDAO, Personality
-from src.traits_matcher_server import get_db_connection, PersonModel, TraitModel
+from src.traits_matcher_server import list_persons_resource, list_traits_resource, get_person_resource, create_person_tool
+from src.daos import MCPPersonDAO, MCPTraitDAO, get_db_connection
+from src.models import PersonModel, TraitModel, Personality
 import json
 import asyncio
 
