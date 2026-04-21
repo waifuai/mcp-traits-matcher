@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mcp-traits-matcher Documentation</title>
+<style>
+
+:root {
+  --bg: #0d1117;
+  --card-bg: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #7ee787;
+  --accent3: #d2a8ff;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 2rem; }
+.container { max-width: 1100px; margin: 0 auto; }
+header { text-align: center; margin-bottom: 3rem; padding: 2rem 0; border-bottom: 1px solid var(--border); }
+header h1 { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem; }
+header p { color: var(--text-muted); font-size: 1.1rem; }
+section { margin-bottom: 2.5rem; }
+h2 { font-size: 1.4rem; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 0.5rem; }
+.count { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
+.section-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+.link-list { display: flex; flex-direction: column; gap: 0.25rem; }
+.link-list a { color: var(--accent); text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; transition: background 0.15s; font-size: 0.95rem; }
+.link-list a:hover { background: var(--card-bg); text-decoration: underline; }
+footer { text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-top: 2rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+
+</style>
+
+</head>
+<body>
+<div class="container">
+
+<header>
+<h1>mcp-traits-matcher</h1>
+<p>GitHub Pages documentation</p>
+</header>
+
+<section>
+<h2>Project Description</h2>
+<h1>MCP Traits Matcher</h1>
+<h2>Description</h2>
+<p>A personality analysis server built using the FastMCP framework. It provides tools and resources for personality analysis and matching. The system analyzes personality traits based on friendliness and dominance scores, allowing you to create persons, define traits, and find matches for job descriptions.</p>
+<h2>Architecture Overview</h2>
+<p>The application consists of several key components:</p>
+<ul>
+<li><strong>FastMCP Server</strong>: Handles HTTP requests and provides MCP protocol endpoints</li>
+<li><strong>Data Access Objects (DAOs)</strong>: Manage database interactions for persons and traits</li>
+<li><strong>Pydantic Models</strong>: Define data structures and validation</li>
+<li><strong>Tools and Resources</strong>: Expose functionality through MCP endpoints</li>
+</ul>
+<pre><code class="language-mermaid">graph TD
+    A[FastMCP Server] --&gt; B[Tools: create_person, add_description, etc.]
+    A --&gt; C[Resources: persons://all, traits://all]
+    B --&gt; D[MCPPersonDAO]
+    B --&gt; E[MCPTraitDAO]
+    C --&gt; D
+    C --&gt; E
+    D --&gt; F[SQLite: mcp_persons.db]
+    E --&gt; G[SQLite: mcp_traits.db]
+</code></pre>
+<h2>Features</h2>
+<ul>
+<li>Creates persons and traits with personality scores</li>
+<li>Adds descriptions to persons, updating their personality based on traits</li>
+<li>Finds people matching a company's job description using Euclidean distance</li>
+<li>Exposes resources for listing persons and traits</li>
+<li>RESTful API endpoints for programmatic access</li>
+</ul>
+<h2>Setup Instructions</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Python 3.8+</li>
+<li>uv (Python package manager)</li>
+</ul>
+<h3>Installation</h3>
+<ol>
+<li>
+<p>Clone the repository:
+    <code>bash
+    git clone &lt;repository-url&gt;
+    cd mcp-traits-matcher</code></p>
+</li>
+<li>
+<p>Create a virtual environment:
+    <code>bash
+    python -m uv venv .venv</code></p>
+</li>
+<li>
+<p>Activate the virtual environment:</p>
+<ul>
+<li>Windows: <code>.venv\Scripts\activate</code></li>
+<li>Linux/macOS: <code>source .venv/bin/activate</code></li>
+</ul>
+</li>
+<li>
+<p>Install dependencies:
+    <code>bash
+    .venv\Scripts\python.exe -m uv pip install -e .[test]</code></p>
+</li>
+</ol>
+<h3>Database Setup</h3>
+<p>The server uses SQLite databases (<code>mcp_persons.db</code> and <code>mcp_traits.db</code>). These databases will be created automatically when the server is run. You can configure the database paths using environment variables:</p>
+<pre><code class="language-bash">export MCP_PERSONS_DB=custom_persons.db
+export MCP_TRAITS_DB=custom_traits.db
+</code></pre>
+<h3>Configuration</h3>
+<p>Create a <code>.env</code> file in the project root:</p>
+<pre><code class="language-env">MCP_PERSONS_DB=mcp_persons.db
+MCP_TRAITS_DB=mcp_traits.db
+LOG_LEVEL=INFO
+</code></pre>
+<h2>Usage Examples</h2>
+<h3>Creating a person</h3>
+<pre><code class="language-python">result = await mcp.create_person(name=&quot;John Doe&quot;)
+print(result)  # &quot;Person 'John Doe' created.&quot;
+</code></pre>
+<h3>Adding a description to a person</h3>
+<pre><code class="language-python">result = await mcp.add_description(name=&quot;John Doe&quot;, description=&quot;friendly and dominant&quot;)
+print(result)  # &quot;Description added to person 'John Doe'.&quot;
+</code></pre>
+<h3>Creating a trait</h3>
+<pre><code class="language-python">result = await mcp.create_trait(name=&quot;friendly&quot;, friendliness=8.0, dominance=2.0)
+print(result)  # &quot;Trait 'friendly' created with friendliness: 8.0, dominance: 2.0.&quot;
+</code></pre>
+<h3>Finding matches for a job description</h3>
+<pre><code class="language-python">matches = await mcp.find_matches(
+    company_name=&quot;Acme Corp&quot;,
+    job_description=&quot;Looking for friendly and dominant candidates&quot;
+)
+print(matches)  # [&quot;John Doe&quot;, &quot;Jane Smith&quot;]
+</code></pre>
+<h3>Listing all persons</h3>
+<pre><code class="language-python">import requests
+response = requests.get(&quot;http://localhost:8000/persons://all&quot;)
+persons = response.json()
+print(persons)
+</code></pre>
+<h2>API Documentation</h2>
+<h3>Resources</h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Description</th>
+<th>Response Format</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>persons://all</code></td>
+<td>Lists all persons</td>
+<td>JSON array of person objects</td>
+</tr>
+<tr>
+<td><code>traits://all</code></td>
+<td>Lists all traits</td>
+<td>JSON array of trait objects</td>
+</tr>
+<tr>
+<td><code>persons://{name}</code></td>
+<td>Gets a person by name</td>
+<td>JSON object</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example Response for <code>persons://all</code>:</strong></p>
+<pre><code class="language-json">[
+  {
+    &quot;name&quot;: &quot;John Doe&quot;,
+    &quot;friendliness&quot;: 7.5,
+    &quot;dominance&quot;: 3.2
+  }
+]
+</code></pre>
+<h3>Tools</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>create_person</code></td>
+<td><code>name: str</code></td>
+<td>Creates a new person with default personality scores</td>
+</tr>
+<tr>
+<td><code>add_description</code></td>
+<td><code>name: str</code>, <code>description: str</code></td>
+<td>Updates person's personality based on traits in description</td>
+</tr>
+<tr>
+<td><code>create_trait</code></td>
+<td><code>name: str</code>, <code>friendliness: float</code>, <code>dominance: float</code></td>
+<td>Creates a new personality trait</td>
+</tr>
+<tr>
+<td><code>find_matches</code></td>
+<td><code>company_name: str</code>, <code>job_description: str</code></td>
+<td>Finds persons matching job requirements</td>
+</tr>
+</tbody>
+</table>
+<h3>Error Handling</h3>
+<p>The API returns appropriate HTTP status codes and error messages:</p>
+<ul>
+<li><code>400 Bad Request</code>: Invalid input parameters</li>
+<li><code>404 Not Found</code>: Person or trait not found</li>
+<li><code>500 Internal Server Error</code>: Database or server errors</li>
+</ul>
+<h2>Development</h2>
+<h3>Running Tests</h3>
+<pre><code class="language-bash">.venv\Scripts\python.exe -m pytest tests/
+</code></pre>
+<h3>Running the Server</h3>
+<pre><code class="language-bash">.venv\Scripts\python.exe -m src.traits_matcher_server
+</code></pre>
+<p>The server will start on <code>http://localhost:8000</code></p>
+<h2>Troubleshooting</h2>
+<h3>Common Issues</h3>
+<ol>
+<li><strong>Database Connection Errors</strong>: Ensure the database files are writable and not corrupted</li>
+<li><strong>Import Errors</strong>: Verify all dependencies are installed correctly</li>
+<li><strong>Port Already in Use</strong>: Change the port using environment variable <code>PORT=8001</code></li>
+</ol>
+<h3>Debugging</h3>
+<p>Enable debug logging by setting <code>LOG_LEVEL=DEBUG</code> in your <code>.env</code> file.</p>
+<h2>Dependencies</h2>
+<ul>
+<li><code>scipy</code> - Scientific computing for distance calculations</li>
+<li><code>pydantic&gt;=2.7.2,&lt;3.0.0</code> - Data validation and serialization</li>
+<li><code>fastmcp</code> - MCP framework</li>
+<li><code>python-dotenv</code> - Environment variable management</li>
+<li><code>pytest</code> - Testing framework (dev dependency)</li>
+</ul>
+<h2>Contributing</h2>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch: <code>git checkout -b feature/amazing-feature</code></li>
+<li>Make your changes and add tests</li>
+<li>Run tests: <code>pytest</code></li>
+<li>Commit your changes: <code>git commit -m 'Add amazing feature'</code></li>
+<li>Push to the branch: <code>git push origin feature/amazing-feature</code></li>
+<li>Open a Pull Request</li>
+</ol>
+<h2>License</h2>
+<p>This project is licensed under the MIT-0 License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+</section>
+
+<section>
+<h2>Source Code</h2>
+<p class="section-desc">View the repository on GitHub.</p>
+<div class="link-list">
+<a href="https://github.com/waifuai/mcp-traits-matcher">GitHub Repository</a>
+</div>
+</section>
+
+
+<footer>
+<p>Generated GitHub Pages for AI agent crawlability.</p>
+</footer>
+
+</div>
+</body>
+</html>
